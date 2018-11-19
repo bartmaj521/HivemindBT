@@ -2,13 +2,10 @@ package com.majewski.hivemindbt.server.connection
 
 import android.bluetooth.*
 import android.util.Log
+import com.majewski.hivemindbt.Uuids
 import java.util.*
 
 class GattServerCallback : BluetoothGattServerCallback() {
-
-    companion object {
-        private val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
-    }
 
     var gattServer: BluetoothGattServer? = null
 
@@ -38,7 +35,7 @@ class GattServerCallback : BluetoothGattServerCallback() {
         characteristic: BluetoothGattCharacteristic?
     ) {
         super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-        if(characteristic?.uuid == CHARACTERISTIC_CLIENT_ID_UUID) {
+        if(characteristic?.uuid == Uuids.CHARACTERISTIC_CLIENT_ID_UUID) {
             Log.d("HivemindServer", "ReadRequest, id: ${mClientsAddresses[device?.address]?.toByte()}")
             gattServer?.sendResponse(device, requestId, 0, 0, byteArrayOf(mClientsAddresses[device?.address]?.toByte() ?: 0))
         }

@@ -5,15 +5,10 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.util.Log
+import com.majewski.hivemindbt.Uuids
 import com.majewski.hivemindbt.client.data.ClientData
-import java.util.*
 
 class GattClientCallback(private val mClientData: ClientData): BluetoothGattCallback() {
-
-    companion object {
-        val SERVICE_UUID = UUID(0L, 300L)
-        val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
-    }
 
     private var mConnected = false
     private var mInitialized = false
@@ -56,15 +51,15 @@ class GattClientCallback(private val mClientData: ClientData): BluetoothGattCall
     ) {
         super.onCharacteristicRead(gatt, characteristic, status)
 
-        if(characteristic.uuid == CHARACTERISTIC_CLIENT_ID_UUID) {
+        if(characteristic.uuid == Uuids.CHARACTERISTIC_CLIENT_ID_UUID) {
             saveClientId(characteristic.value[0])
         }
 
     }
 
     private fun requestClientId(gatt: BluetoothGatt) {
-        val characteristic = gatt.getService(SERVICE_UUID)?.getCharacteristic(
-            CHARACTERISTIC_CLIENT_ID_UUID
+        val characteristic = gatt.getService(Uuids.SERVICE_PRIMARY_UUID)?.getCharacteristic(
+            Uuids.CHARACTERISTIC_CLIENT_ID_UUID
         )
         gatt.readCharacteristic(characteristic)
     }

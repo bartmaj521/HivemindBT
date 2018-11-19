@@ -9,14 +9,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.ParcelUuid
 import android.util.Log
-import java.util.*
+import com.majewski.hivemindbt.Uuids
 
 class ServerConnection(private val mContext: Context) {
-
-    companion object {
-        private val SERVICE_UUID = UUID(0L, 300L)
-        private val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
-    }
 
     // Bluetooth variables
     private val mBluetoothManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -61,10 +56,10 @@ class ServerConnection(private val mContext: Context) {
     }
 
     private fun setupServer() {
-        val service = BluetoothGattService(SERVICE_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
+        val service = BluetoothGattService(Uuids.SERVICE_PRIMARY_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
 
         val clientIdCharacteristic = BluetoothGattCharacteristic(
-            CHARACTERISTIC_CLIENT_ID_UUID,
+            Uuids.CHARACTERISTIC_CLIENT_ID_UUID,
             BluetoothGattCharacteristic.PROPERTY_READ,
             BluetoothGattCharacteristic.PERMISSION_READ
         )
@@ -81,7 +76,7 @@ class ServerConnection(private val mContext: Context) {
             .setTimeout(0)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
             .build()
-        val parcelUUID = ParcelUuid(SERVICE_UUID)
+        val parcelUUID = ParcelUuid(Uuids.SERVICE_PRIMARY_UUID)
         val data = AdvertiseData.Builder()
             .setIncludeDeviceName(false)
             .addServiceUuid(parcelUUID)

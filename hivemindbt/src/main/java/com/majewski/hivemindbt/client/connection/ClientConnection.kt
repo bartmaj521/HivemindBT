@@ -10,15 +10,12 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.ParcelUuid
 import android.util.Log
+import com.majewski.hivemindbt.Uuids
 import com.majewski.hivemindbt.client.data.ClientData
 import java.util.*
 import kotlin.collections.HashMap
 
 class ClientConnection(private val mContext: Context, private val mClientData: ClientData) {
-
-    companion object {
-        val SERVICE_UUID = UUID(0L, 300L)
-    }
 
     // bluetooth variables
     private val mBluetoothAdapter = (mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
@@ -50,7 +47,7 @@ class ClientConnection(private val mContext: Context, private val mClientData: C
 
         val filters = ArrayList<ScanFilter>()
         val scanFilter = ScanFilter.Builder()
-            .setServiceUuid(ParcelUuid(SERVICE_UUID))
+            .setServiceUuid(ParcelUuid(Uuids.SERVICE_PRIMARY_UUID))
             .build()
         filters.add(scanFilter)
         val settings = ScanSettings.Builder()
