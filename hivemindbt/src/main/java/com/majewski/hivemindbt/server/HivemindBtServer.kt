@@ -15,14 +15,17 @@ import kotlin.collections.HashMap
 class HivemindBtServer(private val mContext: Context) {
 
     companion object {
-        val SERVICE_UUID = UUID(0L, 300L)
-        val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
+        private val SERVICE_UUID = UUID(0L, 300L)
+        private val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
     }
+
+    //Data variables
+
 
     // Clients variables
     private val mConnectedDevices = ArrayList<BluetoothDevice>()
     private val mClientsAddresses = HashMap<String, Int>()
-    private var currentClientId = 0
+    private var mCurrentClientId = 0
 
     // Bluetooth variables
     private val mBluetoothManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -59,17 +62,9 @@ class HivemindBtServer(private val mContext: Context) {
         startAdvertising()
     }
 
-    fun pauseServer() {
-        stopAdvertising()
-        stopServer()
-    }
-
-    private fun stopServer() {
-        mGattServer.close()
-    }
-
-    private fun stopAdvertising() {
+    fun stopServer() {
         mBluetoothAdvertiser.stopAdvertising(mAdvertiseCallback)
+        mGattServer.close()
     }
 
     private fun setupServer() {
@@ -82,7 +77,7 @@ class HivemindBtServer(private val mContext: Context) {
         )
 
         service.addCharacteristic(clientIdCharacteristic)
-
+        
         mGattServer.addService(service)
     }
 
@@ -108,8 +103,8 @@ class HivemindBtServer(private val mContext: Context) {
             super.onConnectionStateChange(device, status, newState)
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 if(mClientsAddresses[device.address] == null) {
-                    currentClientId++
-                    mClientsAddresses[device.address] = currentClientId
+                    mCurrentClientId++
+                    mClientsAddresses[device.address] = mCurrentClientId
                 }
                 mConnectedDevices.add(device)
                 Log.d("HivemindServer", "Device connected")
