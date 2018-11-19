@@ -1,7 +1,9 @@
 package com.majewski.hivemindbt.client.connection
 
-import android.bluetooth.*
-import android.content.Intent
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothProfile
 import android.util.Log
 import com.majewski.hivemindbt.client.data.ClientData
 import java.util.*

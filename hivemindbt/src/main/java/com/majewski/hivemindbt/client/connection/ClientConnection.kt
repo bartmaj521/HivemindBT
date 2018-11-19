@@ -18,7 +18,6 @@ class ClientConnection(private val mContext: Context, private val mClientData: C
 
     companion object {
         val SERVICE_UUID = UUID(0L, 300L)
-        val CHARACTERISTIC_UUID = UUID(0L, 301L)
     }
 
     // bluetooth variables

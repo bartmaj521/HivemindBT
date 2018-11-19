@@ -1,6 +1,5 @@
 package com.majewski.hivemindbt
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager

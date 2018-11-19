@@ -7,7 +7,6 @@ import java.util.*
 class GattServerCallback : BluetoothGattServerCallback() {
 
     companion object {
-        private val SERVICE_UUID = UUID(0L, 300L)
         private val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
     }
 
