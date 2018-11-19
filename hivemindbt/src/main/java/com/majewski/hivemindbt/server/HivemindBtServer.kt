@@ -9,8 +9,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.ParcelUuid
 import android.util.Log
+import com.majewski.hivemindbt.server.connection.GattServerCallback
 import java.util.*
-import kotlin.collections.HashMap
+
+
 
 class HivemindBtServer(private val mContext: Context) {
 
@@ -18,14 +20,6 @@ class HivemindBtServer(private val mContext: Context) {
         private val SERVICE_UUID = UUID(0L, 300L)
         private val CHARACTERISTIC_CLIENT_ID_UUID = UUID(0L, 301L)
     }
-
-    //Data variables
-
-
-    // Clients variables
-    private val mConnectedDevices = ArrayList<BluetoothDevice>()
-    private val mClientsAddresses = HashMap<String, Int>()
-    private var mCurrentClientId = 0
 
     // Bluetooth variables
     private val mBluetoothManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -57,7 +51,9 @@ class HivemindBtServer(private val mContext: Context) {
 
     fun startServer() {
         mBluetoothAdvertiser = mBluetoothAdapter.bluetoothLeAdvertiser
-        mGattServer = mBluetoothManager.openGattServer(mContext, GattServerCallback(mConnectedDevices))
+        val gattServerCallback = GattServerCallback()
+        mGattServer = mBluetoothManager.openGattServer(mContext, gattServerCallback)
+        gattServerCallback.gattServer = mGattServer
         setupServer()
         startAdvertising()
     }
@@ -95,36 +91,5 @@ class HivemindBtServer(private val mContext: Context) {
             .build()
         mBluetoothAdvertiser.startAdvertising(settings, data, mAdvertiseCallback)
         Log.d("HivemindServer", "Started server")
-    }
-
-    private inner class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevice>) : BluetoothGattServerCallback() {
-
-        override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
-            super.onConnectionStateChange(device, status, newState)
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                if(mClientsAddresses[device.address] == null) {
-                    mCurrentClientId++
-                    mClientsAddresses[device.address] = mCurrentClientId
-                }
-                mConnectedDevices.add(device)
-                Log.d("HivemindServer", "Device connected")
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                mConnectedDevices.remove(device)
-                Log.d("HivemindServer", "Device disconnected")
-            }
-        }
-
-        override fun onCharacteristicReadRequest(
-            device: BluetoothDevice?,
-            requestId: Int,
-            offset: Int,
-            characteristic: BluetoothGattCharacteristic?
-        ) {
-            super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-            if(characteristic?.uuid == CHARACTERISTIC_CLIENT_ID_UUID) {
-                Log.d("HivemindServer", "ReadRequest, id: ${mClientsAddresses[device?.address]?.toByte()}")
-                mGattServer.sendResponse(device, requestId, 0, 0, byteArrayOf(mClientsAddresses[device?.address]?.toByte() ?: 0))
-            }
-        }
     }
 }
