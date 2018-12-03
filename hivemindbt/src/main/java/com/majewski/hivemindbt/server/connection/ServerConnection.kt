@@ -56,14 +56,21 @@ class ServerConnection(private val mContext: Context) {
     }
 
     private fun setupServer() {
-        val service = BluetoothGattService(Uuids.SERVICE_PRIMARY_UUID, BluetoothGattService.SERVICE_TYPE_PRIMARY)
+        val service = BluetoothGattService(Uuids.SERVICE_PRIMARY, BluetoothGattService.SERVICE_TYPE_PRIMARY)
 
         val clientIdCharacteristic = BluetoothGattCharacteristic(
-            Uuids.CHARACTERISTIC_CLIENT_ID_UUID,
+            Uuids.CHARACTERISTIC_CLIENT_ID,
             BluetoothGattCharacteristic.PROPERTY_READ,
             BluetoothGattCharacteristic.PERMISSION_READ
         )
 
+        val nbOfClientsCharacteristic = BluetoothGattCharacteristic(
+            Uuids.CHARACTERISTIC_NB_OF_CLIENTS,
+            BluetoothGattCharacteristic.PROPERTY_READ,
+            BluetoothGattCharacteristic.PERMISSION_READ
+        )
+
+        service.addCharacteristic(nbOfClientsCharacteristic)
         service.addCharacteristic(clientIdCharacteristic)
 
         mGattServer.addService(service)
@@ -76,9 +83,9 @@ class ServerConnection(private val mContext: Context) {
             .setTimeout(0)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
             .build()
-        val parcelUUID = ParcelUuid(Uuids.SERVICE_PRIMARY_UUID)
+        val parcelUUID = ParcelUuid(Uuids.SERVICE_PRIMARY)
         val data = AdvertiseData.Builder()
-            .setIncludeDeviceName(false)
+            .setIncludeDeviceName(true)
             .addServiceUuid(parcelUUID)
             .build()
         mBluetoothAdvertiser.startAdvertising(settings, data, mAdvertiseCallback)

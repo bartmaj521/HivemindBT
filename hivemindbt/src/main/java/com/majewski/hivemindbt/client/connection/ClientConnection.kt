@@ -47,7 +47,7 @@ class ClientConnection(private val mContext: Context, private val mClientData: C
 
         val filters = ArrayList<ScanFilter>()
         val scanFilter = ScanFilter.Builder()
-            .setServiceUuid(ParcelUuid(Uuids.SERVICE_PRIMARY_UUID))
+            .setServiceUuid(ParcelUuid(Uuids.SERVICE_PRIMARY))
             .build()
         filters.add(scanFilter)
         val settings = ScanSettings.Builder()

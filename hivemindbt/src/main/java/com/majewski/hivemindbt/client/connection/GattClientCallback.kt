@@ -27,6 +27,7 @@ class GattClientCallback(private val mClientData: ClientData): BluetoothGattCall
                 return
             }
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.d("HivemindClient", "Server offline")
                 disconnectGattServer(it)
             }
         }
@@ -40,6 +41,9 @@ class GattClientCallback(private val mClientData: ClientData): BluetoothGattCall
         mInitialized = true
         Log.d("HivemindClient", "Services discovered")
         gatt?.let {
+            val primaryService = gatt.getService(Uuids.SERVICE_PRIMARY)
+            val nbOfClientsCharacteristic = primaryService.getCharacteristic(Uuids.CHARACTERISTIC_NB_OF_CLIENTS)
+            gatt.setCharacteristicNotification(nbOfClientsCharacteristic, true)
             requestClientId(it)
         }
     }
@@ -51,22 +55,34 @@ class GattClientCallback(private val mClientData: ClientData): BluetoothGattCall
     ) {
         super.onCharacteristicRead(gatt, characteristic, status)
 
-        if(characteristic.uuid == Uuids.CHARACTERISTIC_CLIENT_ID_UUID) {
+        if(characteristic.uuid == Uuids.CHARACTERISTIC_CLIENT_ID) {
             saveClientId(characteristic.value[0])
         }
+    }
 
+    override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+        super.onCharacteristicChanged(gatt, characteristic)
+        if(characteristic?.uuid == Uuids.CHARACTERISTIC_NB_OF_CLIENTS) {
+            saveNbOfClients(characteristic.value[0])
+        }
     }
 
     private fun requestClientId(gatt: BluetoothGatt) {
-        val characteristic = gatt.getService(Uuids.SERVICE_PRIMARY_UUID)?.getCharacteristic(
-            Uuids.CHARACTERISTIC_CLIENT_ID_UUID
+        val clientIdCharacteristic = gatt.getService(Uuids.SERVICE_PRIMARY)?.getCharacteristic(
+            Uuids.CHARACTERISTIC_CLIENT_ID
         )
-        gatt.readCharacteristic(characteristic)
+        Log.d("HivemindClient", "Requesting client id")
+        gatt.readCharacteristic(clientIdCharacteristic)
     }
 
     private fun saveClientId(id: Byte) {
         mClientData.clientId = id
         Log.d("HivemindClient", "Connected, client id = $id")
+    }
+
+    private fun saveNbOfClients(nbOfClients: Byte) {
+        mClientData.nbOfClients = nbOfClients
+        Log.d("HivemindClient", "Number of clients changed = ${mClientData.nbOfClients}")
     }
 
     private fun disconnectGattServer(gatt: BluetoothGatt) {
