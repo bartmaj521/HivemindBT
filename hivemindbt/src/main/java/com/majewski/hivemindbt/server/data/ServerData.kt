@@ -1,13 +1,9 @@
-package com.majewski.hivemindbt.client.data
+package com.majewski.hivemindbt.server.data
 
 import com.majewski.hivemindbt.data.SharedElement
 
-class ClientData {
+class ServerData(val maxNbOfClients: Byte) {
 
     var nbOfClients: Byte = 0
-    internal set
-
     var clientId: Byte = 0
-    internal set
-
 }

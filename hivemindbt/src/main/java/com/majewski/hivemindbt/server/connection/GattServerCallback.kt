@@ -3,14 +3,18 @@ package com.majewski.hivemindbt.server.connection
 import android.bluetooth.*
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
+import com.majewski.hivemindbt.server.data.ServerData
 import java.util.*
 
-class GattServerCallback : BluetoothGattServerCallback() {
+class GattServerCallback(private val mConnectedDevices:ArrayList<BluetoothDevice>,
+                         private val mClientsAddresses: HashMap<String, Byte>) : BluetoothGattServerCallback() {
+
+    var onDataReceived: ((Byte) -> Unit)? = null
+
+    private val maxNumberOfClients = 2
 
     var gattServer: BluetoothGattServer? = null
 
-    private val mConnectedDevices = ArrayList<BluetoothDevice>()
-    private val mClientsAddresses = HashMap<String, Byte>()
     private var nbOfClients: Byte = 0
 
     override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
@@ -41,6 +45,66 @@ class GattServerCallback : BluetoothGattServerCallback() {
                 gattServer?.sendResponse(device, requestId, 0, 0, byteArrayOf(mClientsAddresses[device.address] ?: 0))
             }
         }
+    }
+
+    override fun onCharacteristicWriteRequest(
+        device: BluetoothDevice?,
+        requestId: Int,
+        characteristic: BluetoothGattCharacteristic?,
+        preparedWrite: Boolean,
+        responseNeeded: Boolean,
+        offset: Int,
+        value: ByteArray?
+    ) {
+        super.onCharacteristicWriteRequest(
+            device,
+            requestId,
+            characteristic,
+            preparedWrite,
+            responseNeeded,
+            offset,
+            value
+        )
+        Log.d("HivemindServer", "Write request")
+
+        gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+
+        characteristic?.let {
+            val clientId = characteristic.uuid.leastSignificantBits - Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits
+            if(clientId in 1..maxNumberOfClients) {
+                Log.d("HivemindServer", "Received: ${value?.get(0)}")
+                onDataReceived?.invoke(value?.get(0) ?: 0)
+
+                val characteristicSendData = gattServer
+                    ?.getService(Uuids.SERVICE_PRIMARY)
+                    ?.getCharacteristic(Uuids.CHARACTERISTIC_READ_DATA)
+
+                characteristicSendData?.value = value
+                Log.d("HivemindServer", "Characteristic value set.")
+
+                val devices = mConnectedDevices.filter{ mClientsAddresses.keys.contains(it.address) && it != device }
+
+                for(device in devices) {
+                    gattServer?.notifyCharacteristicChanged(device,characteristicSendData, false)
+                    Log.d("HivemindServer", "Notifying device ${device.name}")
+                }
+            }
+        }
+    }
+
+    override fun onDescriptorWriteRequest(
+        device: BluetoothDevice?,
+        requestId: Int,
+        descriptor: BluetoothGattDescriptor?,
+        preparedWrite: Boolean,
+        responseNeeded: Boolean,
+        offset: Int,
+        value: ByteArray?
+    ) {
+        super.onDescriptorWriteRequest(device, requestId, descriptor, preparedWrite, responseNeeded, offset, value)
+        Log.d("HivemindServer", "Descriptor write request: ${value?.get(0)}")
+        descriptor?.value = value
+        gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }
 
     private fun addNewClient(device: BluetoothDevice) {

@@ -15,7 +15,12 @@ import com.majewski.hivemindbt.client.data.ClientData
 import java.util.*
 import kotlin.collections.HashMap
 
-class ClientConnection(private val mContext: Context, private val mClientData: ClientData) {
+class ClientConnection(private val mContext: Context, private val clientData: ClientData) {
+
+    var onDataChanged: ((data: Any)->Unit)? = null
+    set(value) {
+        gattClientCallback.onDataChanged = value
+    }
 
     // bluetooth variables
     private val mBluetoothAdapter = (mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
@@ -26,6 +31,7 @@ class ClientConnection(private val mContext: Context, private val mClientData: C
 
     private val mScanResults = HashMap<String, BluetoothDevice>()
     private val mScanCallback = BleScanCallback(mScanResults) { connectDevice(it)}
+    private var gattClientCallback = GattClientCallback(clientData)
 
     private var mScanning = false
 
@@ -74,8 +80,19 @@ class ClientConnection(private val mContext: Context, private val mClientData: C
     fun connectDevice(device: BluetoothDevice) {
         stopScan()
         Log.d("HivemindClient", "Connecting device")
-        val gattClientCallback = GattClientCallback(mClientData)
         mGatt = device.connectGatt(mContext, false, gattClientCallback)
+    }
+
+    fun sendData(data: Byte) {
+        mGatt?.let {
+            val characteristic = it
+                .getService(Uuids.SERVICE_PRIMARY)
+                .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + clientData.clientId))
+
+            characteristic.value = byteArrayOf(data)
+            it.writeCharacteristic(characteristic)
+            gattClientCallback.dataToSave = data
+        }
     }
 
     private fun requestBluetoothEnable() {

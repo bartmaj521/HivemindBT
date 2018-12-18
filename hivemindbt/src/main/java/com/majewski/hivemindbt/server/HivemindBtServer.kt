@@ -6,6 +6,11 @@ import com.majewski.hivemindbt.server.connection.ServerConnection
 
 class HivemindBtServer(mContext: Context) {
 
+    var onDataReceived: ((Byte) -> Unit)? = null
+        set(value) {
+            mServerConnection.onDataReceived = value
+        }
+
     private val mServerConnection = ServerConnection(mContext)
 
     fun enableBt() = mServerConnection.enableBt()
@@ -16,5 +21,9 @@ class HivemindBtServer(mContext: Context) {
 
     fun stopServer() {
         mServerConnection.stopServer()
+    }
+
+    fun sendData(data: Byte) {
+        mServerConnection.sendData(data)
     }
 }
