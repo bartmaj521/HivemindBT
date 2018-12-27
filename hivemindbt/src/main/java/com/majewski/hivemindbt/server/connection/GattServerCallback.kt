@@ -3,11 +3,14 @@ package com.majewski.hivemindbt.server.connection
 import android.bluetooth.*
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
+import com.majewski.hivemindbt.data.ReceivedElement
+import com.majewski.hivemindbt.server.ServerCallbacks
 import com.majewski.hivemindbt.server.data.ServerData
 import java.util.*
 
-class GattServerCallback(private val mConnectedDevices:ArrayList<BluetoothDevice>,
-                         private val mClientsAddresses: HashMap<String, Byte>) : BluetoothGattServerCallback() {
+class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevice>,
+                         private val mClientsAddresses: HashMap<String, Byte>,
+                         private val mServerCallbacks: ServerCallbacks?) : BluetoothGattServerCallback() {
 
     var onDataReceived: ((Byte) -> Unit)? = null
 
@@ -25,6 +28,10 @@ class GattServerCallback(private val mConnectedDevices:ArrayList<BluetoothDevice
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
             mConnectedDevices.remove(device)
             Log.d("HivemindServer", "Device disconnected")
+            val id = mClientsAddresses[device.address]
+            id?.let{
+                mServerCallbacks?.onClientDisconnected(id)
+            }
         }
     }
 
@@ -88,6 +95,10 @@ class GattServerCallback(private val mConnectedDevices:ArrayList<BluetoothDevice
                     gattServer?.notifyCharacteristicChanged(device,characteristicSendData, false)
                     Log.d("HivemindServer", "Notifying device ${device.name}")
                 }
+                value?.let{
+                    val recv = ReceivedElement(value[0], value[1], byteArrayOf(value[2]))
+                    mServerCallbacks?.onDataChanged(recv)
+                }
             }
         }
     }
@@ -117,6 +128,7 @@ class GattServerCallback(private val mConnectedDevices:ArrayList<BluetoothDevice
             Log.d("HivemindServer", "Notifying device ${d.name}")
             gattServer?.notifyCharacteristicChanged(d, nbOfClientsCharacteristic, false)
         }
+        mServerCallbacks?.onClientConnected(nbOfClients)
         Log.d("HivemindServer", "Client connected, number of clients = $nbOfClients")
     }
 }

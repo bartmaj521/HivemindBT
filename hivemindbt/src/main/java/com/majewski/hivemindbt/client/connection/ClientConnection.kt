@@ -11,11 +11,14 @@ import android.os.Handler
 import android.os.ParcelUuid
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
+import com.majewski.hivemindbt.client.ClientCallbacks
 import com.majewski.hivemindbt.client.data.ClientData
 import java.util.*
 import kotlin.collections.HashMap
 
-class ClientConnection(private val mContext: Context, private val clientData: ClientData) {
+class ClientConnection(private val mContext: Context,
+                       private val clientData: ClientData,
+                       private val clientCallbacks: ClientCallbacks?) {
 
     var onDataChanged: ((data: Any)->Unit)? = null
     set(value) {
@@ -30,8 +33,8 @@ class ClientConnection(private val mContext: Context, private val clientData: Cl
     private var mGatt: BluetoothGatt? = null
 
     private val mScanResults = HashMap<String, BluetoothDevice>()
-    private val mScanCallback = BleScanCallback(mScanResults) { connectDevice(it)}
-    private var gattClientCallback = GattClientCallback(clientData)
+    private val mScanCallback = BleScanCallback(mScanResults) { clientCallbacks?.onServerFound(it)}
+    private var gattClientCallback = GattClientCallback(clientData, clientCallbacks)
 
     private var mScanning = false
 
@@ -89,7 +92,7 @@ class ClientConnection(private val mContext: Context, private val clientData: Cl
                 .getService(Uuids.SERVICE_PRIMARY)
                 .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + clientData.clientId))
 
-            characteristic.value = byteArrayOf(data)
+            characteristic.value = byteArrayOf(clientData.clientId, 0, data)
             it.writeCharacteristic(characteristic)
             gattClientCallback.dataToSave = data
         }

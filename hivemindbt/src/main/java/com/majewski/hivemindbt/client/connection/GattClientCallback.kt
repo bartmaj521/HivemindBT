@@ -3,10 +3,13 @@ package com.majewski.hivemindbt.client.connection
 import android.bluetooth.*
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
+import com.majewski.hivemindbt.client.ClientCallbacks
 import com.majewski.hivemindbt.client.data.ClientData
+import com.majewski.hivemindbt.data.ReceivedElement
 import java.util.*
 
-class GattClientCallback(private val mClientData: ClientData): BluetoothGattCallback() {
+class GattClientCallback(private val mClientData: ClientData,
+                         private val clientCallbacks: ClientCallbacks?): BluetoothGattCallback() {
 
     var onDataChanged: ((data: Any)->Unit)? = null
     var dataToSave: Byte? = null
@@ -88,7 +91,9 @@ class GattClientCallback(private val mClientData: ClientData): BluetoothGattCall
 
     private fun dataChanged(characteristic: BluetoothGattCharacteristic) {
         Log.d("HivemindClient", "Data received: ${characteristic.value[0]}")
-        onDataChanged?.invoke(characteristic.value[0])
+        //onDataChanged?.invoke(characteristic.value[0])
+        val recv = ReceivedElement(characteristic.value[0], characteristic.value[1], byteArrayOf(characteristic.value[2]))
+        clientCallbacks?.onDataChanged(recv)
     }
 
     private fun requestClientId(gatt: BluetoothGatt) {
@@ -101,12 +106,14 @@ class GattClientCallback(private val mClientData: ClientData): BluetoothGattCall
 
     private fun saveClientId(id: Byte) {
         mClientData.clientId = id
+        clientCallbacks?.onConnectedToServer(id)
         Log.d("HivemindClient", "Connected, client id = $id")
     }
 
     private fun saveNbOfClients(nbOfClients: Byte) {
         mClientData.nbOfClients = nbOfClients
         Log.d("HivemindClient", "Number of clients changed = ${mClientData.nbOfClients}")
+        clientCallbacks?.onNumberOfClientsChanged(nbOfClients)
     }
 
     private fun disconnectGattServer(gatt: BluetoothGatt) {

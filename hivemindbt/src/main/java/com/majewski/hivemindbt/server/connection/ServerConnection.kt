@@ -10,9 +10,11 @@ import android.content.Intent
 import android.os.ParcelUuid
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
+import com.majewski.hivemindbt.server.ServerCallbacks
 import java.util.*
 
-class ServerConnection(private val mContext: Context) {
+class ServerConnection(private val mContext: Context,
+                       private val mServerCallbacks: ServerCallbacks?) {
 
     var onDataReceived: ((Byte) -> Unit)? = null
     set(value) {
@@ -30,7 +32,7 @@ class ServerConnection(private val mContext: Context) {
     private val mConnectedDevices = ArrayList<BluetoothDevice>()
     private val mClientsAddresses = HashMap<String, Byte>()
 
-    val gattServerCallback = GattServerCallback(mConnectedDevices, mClientsAddresses)
+    private val gattServerCallback = GattServerCallback(mConnectedDevices, mClientsAddresses, mServerCallbacks)
 
     private val mAdvertiseCallback = object: AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
@@ -72,7 +74,7 @@ class ServerConnection(private val mContext: Context) {
             .getService(Uuids.SERVICE_PRIMARY)
             .getCharacteristic(Uuids.CHARACTERISTIC_READ_DATA)
 
-        characteristic.value = byteArrayOf(data)
+        characteristic.value = byteArrayOf(0, 0, data)
         Log.d("HivemindServer", "Characteristic value set.")
 
         val devices = mConnectedDevices.filter{ mClientsAddresses.keys.contains(it.address) }

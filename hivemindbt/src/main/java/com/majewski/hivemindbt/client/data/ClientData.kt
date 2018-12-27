@@ -1,7 +1,5 @@
 package com.majewski.hivemindbt.client.data
 
-import com.majewski.hivemindbt.data.SharedElement
-
 class ClientData {
 
     var nbOfClients: Byte = 0
