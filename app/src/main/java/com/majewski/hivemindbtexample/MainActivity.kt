@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
                 it.sendData(lol)
                 Toast.makeText(this, "lol: $lol", Toast.LENGTH_SHORT).show()
             }
-
         }
     }
 

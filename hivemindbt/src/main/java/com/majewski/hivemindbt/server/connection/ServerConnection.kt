@@ -16,11 +16,6 @@ import java.util.*
 class ServerConnection(private val mContext: Context,
                        private val mServerCallbacks: ServerCallbacks?) {
 
-    var onDataReceived: ((Byte) -> Unit)? = null
-    set(value) {
-        gattServerCallback.onDataReceived = value
-    }
-
     // Bluetooth variables
     private val mBluetoothManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val mBluetoothAdapter = mBluetoothManager.adapter

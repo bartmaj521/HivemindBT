@@ -7,11 +7,6 @@ import com.majewski.hivemindbt.client.data.ClientData
 
 class HivemindBtClient(context: Context, private val clientCallbacks: ClientCallbacks? = null) {
 
-    var onDataChanged: ((data: Any)->Unit)? = null
-    set(value) {
-        mClientConnection.onDataChanged = value
-    }
-
     private val data = ClientData()
     private val mClientConnection = ClientConnection(context, data, clientCallbacks)
 

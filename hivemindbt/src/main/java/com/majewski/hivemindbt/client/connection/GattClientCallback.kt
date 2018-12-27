@@ -11,7 +11,6 @@ import java.util.*
 class GattClientCallback(private val mClientData: ClientData,
                          private val clientCallbacks: ClientCallbacks?): BluetoothGattCallback() {
 
-    var onDataChanged: ((data: Any)->Unit)? = null
     var dataToSave: Byte? = null
 
     private var mConnected = false
@@ -91,7 +90,6 @@ class GattClientCallback(private val mClientData: ClientData,
 
     private fun dataChanged(characteristic: BluetoothGattCharacteristic) {
         Log.d("HivemindClient", "Data received: ${characteristic.value[0]}")
-        //onDataChanged?.invoke(characteristic.value[0])
         val recv = ReceivedElement(characteristic.value[0], characteristic.value[1], byteArrayOf(characteristic.value[2]))
         clientCallbacks?.onDataChanged(recv)
     }

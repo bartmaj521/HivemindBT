@@ -20,11 +20,6 @@ class ClientConnection(private val mContext: Context,
                        private val clientData: ClientData,
                        private val clientCallbacks: ClientCallbacks?) {
 
-    var onDataChanged: ((data: Any)->Unit)? = null
-    set(value) {
-        gattClientCallback.onDataChanged = value
-    }
-
     // bluetooth variables
     private val mBluetoothAdapter = (mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
     private val mBluetoothLeScanner: BluetoothLeScanner by lazy {

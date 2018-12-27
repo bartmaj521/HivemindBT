@@ -12,8 +12,6 @@ class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevic
                          private val mClientsAddresses: HashMap<String, Byte>,
                          private val mServerCallbacks: ServerCallbacks?) : BluetoothGattServerCallback() {
 
-    var onDataReceived: ((Byte) -> Unit)? = null
-
     private val maxNumberOfClients = 2
 
     var gattServer: BluetoothGattServer? = null
@@ -80,7 +78,6 @@ class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevic
             val clientId = characteristic.uuid.leastSignificantBits - Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits
             if(clientId in 1..maxNumberOfClients) {
                 Log.d("HivemindServer", "Received: ${value?.get(0)}")
-                onDataReceived?.invoke(value?.get(0) ?: 0)
 
                 val characteristicSendData = gattServer
                     ?.getService(Uuids.SERVICE_PRIMARY)
