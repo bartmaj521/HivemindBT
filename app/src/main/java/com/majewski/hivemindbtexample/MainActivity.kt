@@ -40,13 +40,13 @@ class MainActivity : AppCompatActivity() {
         btn_send_data.setOnClickListener {
             server?.let {
                 lol++
-                it.sendData(lol)
+                it.sendData("testServer".toByteArray())
                 Toast.makeText(this, "lol: $lol", Toast.LENGTH_SHORT).show()
             }
 
             client?.let {
                 lol++
-                it.sendData(lol)
+                it.sendData("testClient".toByteArray())
                 Toast.makeText(this, "lol: $lol", Toast.LENGTH_SHORT).show()
             }
         }
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDataChanged(data: ReceivedElement) {
             runOnUiThread {
-                Toast.makeText(this@MainActivity, "New data: ${data.data[0]}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}", Toast.LENGTH_SHORT).show()
                 lol = data.data[0]
             }
         }
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDataChanged(data: ReceivedElement) {
             runOnUiThread {
-                Toast.makeText(this@MainActivity, "New data: ${data.data[0]}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}", Toast.LENGTH_SHORT).show()
                 lol = data.data[0]
             }
         }

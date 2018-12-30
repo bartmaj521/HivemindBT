@@ -64,12 +64,12 @@ class ServerConnection(private val mContext: Context,
         mGattServer.close()
     }
 
-    fun sendData(data: Byte) {
+    fun sendData(data: ByteArray) {
         val characteristic = mGattServer
             .getService(Uuids.SERVICE_PRIMARY)
             .getCharacteristic(Uuids.CHARACTERISTIC_READ_DATA)
 
-        characteristic.value = byteArrayOf(0, 0, data)
+        characteristic.value = byteArrayOf(0, 0).plus(data)
         Log.d("HivemindServer", "Characteristic value set.")
 
         val devices = mConnectedDevices.filter{ mClientsAddresses.keys.contains(it.address) }

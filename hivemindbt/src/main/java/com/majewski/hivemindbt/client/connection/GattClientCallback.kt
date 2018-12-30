@@ -11,7 +11,7 @@ import java.util.*
 class GattClientCallback(private val mClientData: ClientData,
                          private val clientCallbacks: ClientCallbacks?): BluetoothGattCallback() {
 
-    var dataToSave: Byte? = null
+    //var dataToSave: Byte? = null
 
     private var mConnected = false
     private var mInitialized = false
@@ -66,14 +66,14 @@ class GattClientCallback(private val mClientData: ClientData,
         }
     }
 
-    override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
-        super.onDescriptorWrite(gatt, descriptor, status)
-        dataToSave?.let {
-            descriptor?.characteristic?.value = byteArrayOf(it)
-            gatt?.writeCharacteristic(descriptor?.characteristic)
-            dataToSave = null
-        }
-    }
+//    override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
+//        super.onDescriptorWrite(gatt, descriptor, status)
+//        dataToSave?.let {
+//            descriptor?.characteristic?.value = byteArrayOf(it)
+//            gatt?.writeCharacteristic(descriptor?.characteristic)
+//            dataToSave = null
+//        }
+//    }
 
     override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
         super.onCharacteristicChanged(gatt, characteristic)
@@ -90,7 +90,7 @@ class GattClientCallback(private val mClientData: ClientData,
 
     private fun dataChanged(characteristic: BluetoothGattCharacteristic) {
         Log.d("HivemindClient", "Data received: ${characteristic.value[0]}")
-        val recv = ReceivedElement(characteristic.value[0], characteristic.value[1], byteArrayOf(characteristic.value[2]))
+        val recv = ReceivedElement(characteristic.value[0], characteristic.value[1], characteristic.value.copyOfRange(2, characteristic.value.size))
         clientCallbacks?.onDataChanged(recv)
     }
 

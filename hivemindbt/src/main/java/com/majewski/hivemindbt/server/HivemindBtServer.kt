@@ -19,7 +19,7 @@ class HivemindBtServer(mContext: Context,
         mServerConnection.stopServer()
     }
 
-    fun sendData(data: Byte) {
+    fun sendData(data: ByteArray) {
         mServerConnection.sendData(data)
     }
 }

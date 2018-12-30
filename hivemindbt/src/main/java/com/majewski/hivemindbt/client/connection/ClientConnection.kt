@@ -81,15 +81,15 @@ class ClientConnection(private val mContext: Context,
         mGatt = device.connectGatt(mContext, false, gattClientCallback)
     }
 
-    fun sendData(data: Byte) {
+    fun sendData(data: ByteArray) {
         mGatt?.let {
             val characteristic = it
                 .getService(Uuids.SERVICE_PRIMARY)
                 .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + clientData.clientId))
 
-            characteristic.value = byteArrayOf(clientData.clientId, 0, data)
+            characteristic.value = byteArrayOf(clientData.clientId, 0).plus(data)
             it.writeCharacteristic(characteristic)
-            gattClientCallback.dataToSave = data
+            //gattClientCallback.dataToSave = data
         }
     }
 

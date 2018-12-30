@@ -93,7 +93,7 @@ class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevic
                     Log.d("HivemindServer", "Notifying device ${device.name}")
                 }
                 value?.let{
-                    val recv = ReceivedElement(value[0], value[1], byteArrayOf(value[2]))
+                    val recv = ReceivedElement(value[0], value[1], value.copyOfRange(2, value.size))
                     mServerCallbacks?.onDataChanged(recv)
                 }
             }

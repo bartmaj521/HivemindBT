@@ -24,7 +24,7 @@ class HivemindBtClient(context: Context, private val clientCallbacks: ClientCall
         mClientConnection.connectDevice(device)
     }
 
-    fun sendData(data: Byte) {
+    fun sendData(data: ByteArray) {
         mClientConnection.sendData(data)
     }
 }
