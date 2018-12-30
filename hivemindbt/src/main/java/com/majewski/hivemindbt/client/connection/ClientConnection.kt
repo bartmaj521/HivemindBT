@@ -1,23 +1,19 @@
 package com.majewski.hivemindbt.client.connection
 
-import android.Manifest
-import android.app.Activity
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.ParcelUuid
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
 import com.majewski.hivemindbt.client.ClientCallbacks
-import com.majewski.hivemindbt.client.data.ClientData
+import com.majewski.hivemindbt.data.SharedData
 import java.util.*
 import kotlin.collections.HashMap
 
 class ClientConnection(private val mContext: Context,
-                       private val clientData: ClientData,
+                       private val clientData: SharedData,
                        private val clientCallbacks: ClientCallbacks?) {
 
     // bluetooth variables
@@ -70,15 +66,14 @@ class ClientConnection(private val mContext: Context,
         mGatt = device.connectGatt(mContext, false, gattClientCallback)
     }
 
-    fun sendData(data: ByteArray) {
+    fun sendData(data: ByteArray, elementId: Byte) {
         mGatt?.let {
             val characteristic = it
                 .getService(Uuids.SERVICE_PRIMARY)
                 .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + clientData.clientId))
 
-            characteristic.value = byteArrayOf(clientData.clientId, 0).plus(data)
+            characteristic.value = byteArrayOf(clientData.clientId, elementId).plus(data)
             it.writeCharacteristic(characteristic)
-            //gattClientCallback.dataToSave = data
         }
     }
 }

@@ -3,12 +3,12 @@ package com.majewski.hivemindbt.client
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import com.majewski.hivemindbt.client.connection.ClientConnection
-import com.majewski.hivemindbt.client.data.ClientData
+import com.majewski.hivemindbt.data.SharedData
 
 class HivemindBtClient(context: Context, private val clientCallbacks: ClientCallbacks? = null) {
 
-    private val data = ClientData()
-    private val mClientConnection = ClientConnection(context, data, clientCallbacks)
+    private val clientData = SharedData()
+    private val mClientConnection = ClientConnection(context, clientData, clientCallbacks)
 
     fun startScan() {
         mClientConnection.startScan()
@@ -22,7 +22,17 @@ class HivemindBtClient(context: Context, private val clientCallbacks: ClientCall
         mClientConnection.connectDevice(device)
     }
 
-    fun sendData(data: ByteArray) {
-        mClientConnection.sendData(data)
+    fun addData(name: String, id: Byte) {
+        clientData.addElement(name, id)
+    }
+
+    fun sendData(data: ByteArray, elementName: String) {
+        val elementId = clientData.getElementId(elementName) ?: throw NoSuchElementException()
+        clientData.setElementValue(elementId, data)
+        mClientConnection.sendData(data, elementId)
+    }
+
+    fun getData(elementName: String, clientId: Byte): ByteArray {
+        return clientData.getElementValue(elementName, clientId)
     }
 }

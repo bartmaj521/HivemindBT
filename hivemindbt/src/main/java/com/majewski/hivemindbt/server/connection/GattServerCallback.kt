@@ -4,12 +4,13 @@ import android.bluetooth.*
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
 import com.majewski.hivemindbt.data.ReceivedElement
+import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.ServerCallbacks
-import com.majewski.hivemindbt.server.data.ServerData
 import java.util.*
 
 class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevice>,
                          private val mClientsAddresses: HashMap<String, Byte>,
+                         private val mServerData: SharedData,
                          private val mServerCallbacks: ServerCallbacks?) : BluetoothGattServerCallback() {
 
     private val maxNumberOfClients = 2
@@ -94,6 +95,7 @@ class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevic
                 }
                 value?.let{
                     val recv = ReceivedElement(value[0], value[1], value.copyOfRange(2, value.size))
+                    mServerData.setElementValueFromClient(recv.dataId, recv.from, recv.data)
                     mServerCallbacks?.onDataChanged(recv)
                 }
             }

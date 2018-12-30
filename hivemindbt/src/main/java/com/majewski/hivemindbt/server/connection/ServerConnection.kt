@@ -10,10 +10,12 @@ import android.content.Intent
 import android.os.ParcelUuid
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
+import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.ServerCallbacks
 import java.util.*
 
 class ServerConnection(private val mContext: Context,
+                       private val mServerData: SharedData,
                        private val mServerCallbacks: ServerCallbacks?) {
 
     // Bluetooth variables
@@ -27,17 +29,19 @@ class ServerConnection(private val mContext: Context,
     private val mConnectedDevices = ArrayList<BluetoothDevice>()
     private val mClientsAddresses = HashMap<String, Byte>()
 
-    private val gattServerCallback = GattServerCallback(mConnectedDevices, mClientsAddresses, mServerCallbacks)
+    private val gattServerCallback = GattServerCallback(mConnectedDevices, mClientsAddresses, mServerData, mServerCallbacks)
 
     private val mAdvertiseCallback = object: AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             super.onStartSuccess(settingsInEffect)
-            Log.d("bleTest", "Peripheral advertising started.")
+            Log.d("AdvertiseCallback", "Peripheral advertising started.")
+            mServerCallbacks?.onServerStarted()
         }
 
         override fun onStartFailure(errorCode: Int) {
             super.onStartFailure(errorCode)
-            Log.d("bleTest", "Peripheral advertising failed: $errorCode")
+            Log.e("AdvertiseCallback", "Peripheral advertising failed: $errorCode")
+            mServerCallbacks?.onServerFailed(errorCode)
         }
     }
 
@@ -54,12 +58,12 @@ class ServerConnection(private val mContext: Context,
         mGattServer.close()
     }
 
-    fun sendData(data: ByteArray) {
+    fun sendData(data: ByteArray, elementId: Byte) {
         val characteristic = mGattServer
             .getService(Uuids.SERVICE_PRIMARY)
             .getCharacteristic(Uuids.CHARACTERISTIC_READ_DATA)
 
-        characteristic.value = byteArrayOf(0, 0).plus(data)
+        characteristic.value = byteArrayOf(0, elementId).plus(data)
         Log.d("HivemindServer", "Characteristic value set.")
 
         val devices = mConnectedDevices.filter{ mClientsAddresses.keys.contains(it.address) }

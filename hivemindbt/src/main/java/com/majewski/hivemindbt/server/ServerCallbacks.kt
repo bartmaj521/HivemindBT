@@ -9,4 +9,8 @@ interface ServerCallbacks {
     fun onClientDisconnected(clientId: Byte)
 
     fun onDataChanged(data: ReceivedElement)
+
+    fun onServerStarted()
+
+    fun onServerFailed(errorCode: Int)
 }

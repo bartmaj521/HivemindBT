@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             server = HivemindBtServer(this, serverCallbacks)
+            server?.addData("test", 0)
             server?.startServer()
         }
 
@@ -41,25 +42,39 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             client = HivemindBtClient(this, clientCallbacks)
+            client?.addData("test", 0)
             client?.startScan()
         }
 
         btn_send_data.setOnClickListener {
             server?.let {
                 lol++
-                it.sendData("testServer".toByteArray())
+                it.sendData("testServer".toByteArray(), "test")
                 Toast.makeText(this, "lol: $lol", Toast.LENGTH_SHORT).show()
             }
 
             client?.let {
                 lol++
-                it.sendData("testClient".toByteArray())
+                it.sendData("testClient".toByteArray(),"test")
                 Toast.makeText(this, "lol: $lol", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btn_cached_data.setOnClickListener {
+            val text = et_clientid.text
+            if(text != null) {
+                server?.let {
+                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())), Toast.LENGTH_SHORT).show()
+                }
+                client?.let {
+                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     val serverCallbacks = object : ServerCallbacks {
+
         override fun onClientConnected(nbOfClients: Byte) {
             Log.d("lolol", "Client connected")
         }
@@ -75,10 +90,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        override fun onServerStarted() {
+            Log.d("lolol", "Server started")
+        }
+
+        override fun onServerFailed(errorCode: Int) {
+            Log.d("lolol", "Server failed")
+        }
+
     }
 
     val clientCallbacks = object : ClientCallbacks {
         override fun onServerFound(device: BluetoothDevice) {
+            client?.stopScan()
             client?.connectDevice(device)
         }
 
