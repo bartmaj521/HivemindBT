@@ -9,8 +9,6 @@ class HivemindBtServer(mContext: Context,
 
     private val mServerConnection = ServerConnection(mContext, serverCallbacks)
 
-    fun enableBt() = mServerConnection.enableBt()
-
     fun startServer() {
         mServerConnection.startServer()
     }

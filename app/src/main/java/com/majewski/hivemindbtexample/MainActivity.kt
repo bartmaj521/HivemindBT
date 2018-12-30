@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.majewski.hivemindbt.HivemindBt
 import com.majewski.hivemindbt.client.ClientCallbacks
 import com.majewski.hivemindbt.client.HivemindBtClient
 import com.majewski.hivemindbt.data.ReceivedElement
@@ -26,14 +27,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btn_server.setOnClickListener {
+            if(!HivemindBt.isBluetoothEnabled(this)){
+                HivemindBt.requestEnableBluetooth(this)
+                return@setOnClickListener
+            }
             server = HivemindBtServer(this, serverCallbacks)
-            if(server?.enableBt() != true) finish()
             server?.startServer()
         }
 
         btn_client.setOnClickListener {
+            if(!HivemindBt.isBluetoothEnabled(this)){
+                HivemindBt.requestEnableBluetooth(this)
+                return@setOnClickListener
+            }
             client = HivemindBtClient(this, clientCallbacks)
-            if(client?.askPermissions() != true) finish()
             client?.startScan()
         }
 

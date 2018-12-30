@@ -10,8 +10,6 @@ class HivemindBtClient(context: Context, private val clientCallbacks: ClientCall
     private val data = ClientData()
     private val mClientConnection = ClientConnection(context, data, clientCallbacks)
 
-    fun askPermissions(): Boolean = mClientConnection.askPermissions()
-
     fun startScan() {
         mClientConnection.startScan()
     }

@@ -33,17 +33,6 @@ class ClientConnection(private val mContext: Context,
 
     private var mScanning = false
 
-    fun askPermissions(): Boolean {
-        if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled) {
-            requestBluetoothEnable()
-            return mBluetoothAdapter.isEnabled
-        } else if (!hasLocationPermissions()){
-            requestLocationPermission()
-            return hasLocationPermissions()
-        }
-        return true
-    }
-
     fun startScan(time: Long = 10000) {
         if(mScanning) {
             return
@@ -91,18 +80,5 @@ class ClientConnection(private val mContext: Context,
             it.writeCharacteristic(characteristic)
             //gattClientCallback.dataToSave = data
         }
-    }
-
-    private fun requestBluetoothEnable() {
-        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        (mContext as Activity).startActivityForResult(enableBtIntent, 1)
-    }
-
-    private fun hasLocationPermissions(): Boolean {
-        return (mContext as Activity).checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestLocationPermission() {
-        (mContext as Activity).requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 2)
     }
 }

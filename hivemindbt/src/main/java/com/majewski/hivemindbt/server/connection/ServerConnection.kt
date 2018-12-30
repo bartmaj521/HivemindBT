@@ -41,16 +41,6 @@ class ServerConnection(private val mContext: Context,
         }
     }
 
-    fun enableBt(): Boolean {
-        return if (mBluetoothAdapter.isEnabled) {
-            true
-        } else {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            mContext.startActivity(enableBtIntent)
-            mBluetoothAdapter.isEnabled
-        }
-    }
-
     fun startServer() {
         mBluetoothAdvertiser = mBluetoothAdapter.bluetoothLeAdvertiser
         mGattServer = mBluetoothManager.openGattServer(mContext, gattServerCallback)
