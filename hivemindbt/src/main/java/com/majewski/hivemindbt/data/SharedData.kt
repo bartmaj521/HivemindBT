@@ -18,18 +18,18 @@ class SharedData {
     }
 
     fun setElementValue(elementId: Byte, value: ByteArray) {
-        val elementData = clients[elementId] ?: throw NoSuchElementException("Element with given id not found.")
+        val elementData = clients[elementId] ?: throw NoSuchElementException("Element with given id/name not found.")
         elementData[clientId] = value
 }
 
-    fun getElementValue(name: String, clientId: Byte): ByteArray {
-        val elementId = nameIdDictionary[name] ?: throw NoSuchElementException("Element with given name not found.")
+    fun getElementValue(name: String, clientId: Byte): ByteArray? {
+        val elementId = nameIdDictionary[name]
         return getElementValue(elementId, clientId)
     }
 
-    fun getElementValue(elementId: Byte, clientId: Byte): ByteArray {
-        val elementData = clients[elementId] ?: throw NoSuchElementException("Element with given id not found.")
-        return elementData[clientId] ?: throw NoSuchElementException("Element with given clientId not found.")
+    fun getElementValue(elementId: Byte?, clientId: Byte): ByteArray? {
+        val elementData = clients[elementId]
+        return elementData?.get(clientId)
     }
 
     fun getElementId(name: String) = nameIdDictionary[name]
