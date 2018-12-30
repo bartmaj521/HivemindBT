@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDataChanged(data: ReceivedElement) {
             runOnUiThread {
-                Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}, with name: ${data.name}", Toast.LENGTH_SHORT).show()
                 lol = data.data[0]
             }
         }
@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
                 if(data.dataId == 1.toByte()){
                     sb_test.progress = data.data[0].toInt()
                 } else {
-                    Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}, with name: ${data.name}", Toast.LENGTH_SHORT).show()
                     lol = data.data[0]
                 }
             }

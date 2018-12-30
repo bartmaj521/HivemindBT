@@ -79,7 +79,7 @@ internal class GattClientCallback(private val mClientData: SharedData,
 
     private fun dataChanged(characteristic: BluetoothGattCharacteristic) {
         Log.d("HivemindClient", "Data received: ${characteristic.value[0]}")
-        val recv = ReceivedElement(characteristic.value[0], characteristic.value[1], characteristic.value.copyOfRange(2, characteristic.value.size))
+        val recv = ReceivedElement(characteristic.value[0], characteristic.value[1],mClientData.getElementName(characteristic.value[1]) ,characteristic.value.copyOfRange(2, characteristic.value.size))
         mClientData.setElementValueFromClient(recv.dataId, recv.from, recv.data)
         clientCallbacks?.onDataChanged(recv)
     }

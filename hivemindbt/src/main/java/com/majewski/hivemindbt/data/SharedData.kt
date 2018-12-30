@@ -34,6 +34,8 @@ internal class SharedData {
 
     fun getElementId(name: String) = nameIdDictionary[name]
 
+    fun getElementName(id: Byte) = nameIdDictionary.filter { it.value == id }.keys.first()
+
     fun setElementValueFromClient(elementId: Byte, clientId: Byte, value: ByteArray) {
         clients[elementId]?.put(clientId, value)
     }

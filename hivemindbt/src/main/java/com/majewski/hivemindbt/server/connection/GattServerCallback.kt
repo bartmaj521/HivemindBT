@@ -94,7 +94,7 @@ internal class GattServerCallback(private val mConnectedDevices: ArrayList<Bluet
                     Log.d("HivemindServer", "Notifying device ${device.name}")
                 }
                 value?.let{
-                    val recv = ReceivedElement(value[0], value[1], value.copyOfRange(2, value.size))
+                    val recv = ReceivedElement(value[0], value[1],mServerData.getElementName(value[1]) ,value.copyOfRange(2, value.size))
                     mServerData.setElementValueFromClient(recv.dataId, recv.from, recv.data)
                     mServerCallbacks?.onDataChanged(recv)
                 }
