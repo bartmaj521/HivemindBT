@@ -32,7 +32,7 @@ class HivemindBtClient(context: Context, private val clientCallbacks: ClientCall
         mClientConnection.sendData(data, elementId)
     }
 
-    fun getData(elementName: String, clientId: Byte): ByteArray {
+    fun getData(elementName: String, clientId: Byte): ByteArray? {
         return clientData.getElementValue(elementName, clientId)
     }
 }

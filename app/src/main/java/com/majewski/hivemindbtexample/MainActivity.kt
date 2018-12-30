@@ -64,10 +64,10 @@ class MainActivity : AppCompatActivity() {
             val text = et_clientid.text
             if(text != null) {
                 server?.let {
-                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())?: byteArrayOf()), Toast.LENGTH_SHORT).show()
                 }
                 client?.let {
-                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())?: byteArrayOf()), Toast.LENGTH_SHORT).show()
                 }
             }
         }

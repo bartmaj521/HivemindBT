@@ -29,7 +29,7 @@ class HivemindBtServer(mContext: Context,
         mServerConnection.sendData(data, elementId)
     }
 
-    fun getData(elementName: String, clientId: Byte): ByteArray {
+    fun getData(elementName: String, clientId: Byte): ByteArray? {
         return mServerData.getElementValue(elementName, clientId)
     }
 }
