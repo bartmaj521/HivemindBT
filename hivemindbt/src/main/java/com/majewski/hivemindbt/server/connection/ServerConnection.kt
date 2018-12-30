@@ -14,8 +14,8 @@ import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.ServerCallbacks
 import java.util.*
 
-class ServerConnection(private val mContext: Context,
-                       private val mServerData: SharedData,
+internal class ServerConnection(private val mContext: Context,
+                       mServerData: SharedData,
                        private val mServerCallbacks: ServerCallbacks?) {
 
     // Bluetooth variables

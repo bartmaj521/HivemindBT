@@ -12,7 +12,7 @@ import com.majewski.hivemindbt.data.SharedData
 import java.util.*
 import kotlin.collections.HashMap
 
-class ClientConnection(private val mContext: Context,
+internal class ClientConnection(private val mContext: Context,
                        private val clientData: SharedData,
                        private val clientCallbacks: ClientCallbacks?) {
 

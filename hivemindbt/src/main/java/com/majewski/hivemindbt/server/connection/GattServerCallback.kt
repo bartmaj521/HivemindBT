@@ -8,7 +8,7 @@ import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.ServerCallbacks
 import java.util.*
 
-class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevice>,
+internal class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevice>,
                          private val mClientsAddresses: HashMap<String, Byte>,
                          private val mServerData: SharedData,
                          private val mServerCallbacks: ServerCallbacks?) : BluetoothGattServerCallback() {

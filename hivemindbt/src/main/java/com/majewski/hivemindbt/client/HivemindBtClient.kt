@@ -5,7 +5,7 @@ import android.content.Context
 import com.majewski.hivemindbt.client.connection.ClientConnection
 import com.majewski.hivemindbt.data.SharedData
 
-class HivemindBtClient(context: Context, private val clientCallbacks: ClientCallbacks? = null) {
+class HivemindBtClient(context: Context, clientCallbacks: ClientCallbacks? = null) {
 
     private val clientData = SharedData()
     private val mClientConnection = ClientConnection(context, clientData, clientCallbacks)

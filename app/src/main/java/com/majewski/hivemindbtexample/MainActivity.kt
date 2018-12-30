@@ -1,10 +1,10 @@
 package com.majewski.hivemindbtexample
 
 import android.bluetooth.BluetoothDevice
-import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.widget.SeekBar
 import android.widget.Toast
 import com.majewski.hivemindbt.HivemindBt
 import com.majewski.hivemindbt.client.ClientCallbacks
@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             }
             server = HivemindBtServer(this, serverCallbacks)
             server?.addData("test", 0)
+            server?.addData("seekbar", 1)
             server?.startServer()
         }
 
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
             }
             client = HivemindBtClient(this, clientCallbacks)
             client?.addData("test", 0)
+            client?.addData("seekbar", 1)
             client?.startScan()
         }
 
@@ -71,9 +73,32 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        sb_test.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+
+            var touching = false
+
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
+                if(touching) {
+                    server?.sendData(byteArrayOf(progress.toByte()), "seekbar")
+                    client?.sendData(byteArrayOf(progress.toByte()), "seekbar")
+                }
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                touching = true
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                touching = false
+            }
+
+        })
     }
 
-    val serverCallbacks = object : ServerCallbacks {
+    private val serverCallbacks = object : ServerCallbacks {
 
         override fun onClientConnected(nbOfClients: Byte) {
             Log.d("lolol", "Client connected")
@@ -100,7 +125,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    val clientCallbacks = object : ClientCallbacks {
+    private val clientCallbacks = object : ClientCallbacks {
         override fun onServerFound(device: BluetoothDevice) {
             client?.stopScan()
             client?.connectDevice(device)
@@ -116,8 +141,12 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDataChanged(data: ReceivedElement) {
             runOnUiThread {
-                Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}", Toast.LENGTH_SHORT).show()
-                lol = data.data[0]
+                if(data.dataId == 1.toByte()){
+                    sb_test.progress = data.data[0].toInt()
+                } else {
+                    Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}", Toast.LENGTH_SHORT).show()
+                    lol = data.data[0]
+                }
             }
         }
 

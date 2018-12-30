@@ -8,7 +8,7 @@ import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.data.ReceivedElement
 import java.util.*
 
-class GattClientCallback(private val mClientData: SharedData,
+internal class GattClientCallback(private val mClientData: SharedData,
                          private val clientCallbacks: ClientCallbacks?): BluetoothGattCallback() {
 
     private var mConnected = false

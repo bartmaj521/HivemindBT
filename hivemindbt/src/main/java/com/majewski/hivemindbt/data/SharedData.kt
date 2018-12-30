@@ -1,6 +1,6 @@
 package com.majewski.hivemindbt.data
 
-class SharedData {
+internal class SharedData {
 
     var nbOfClients: Byte = 0
     internal set
