@@ -3,10 +3,10 @@ package com.majewski.hivemindbt.data
 internal class SharedData {
 
     var nbOfClients: Byte = 0
-    internal set
+        internal set
 
     var clientId: Byte = 0
-    internal set
+        internal set
 
     private val clients = HashMap<Byte, HashMap<Byte, ByteArray>>()
 
@@ -20,7 +20,7 @@ internal class SharedData {
     fun setElementValue(elementId: Byte, value: ByteArray) {
         val elementData = clients[elementId] ?: throw NoSuchElementException("Element with given id/name not found.")
         elementData[clientId] = value
-}
+    }
 
     fun getElementValue(name: String, clientId: Byte): ByteArray? {
         val elementId = nameIdDictionary[name]

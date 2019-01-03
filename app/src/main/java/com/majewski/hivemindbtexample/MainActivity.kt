@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btn_server.setOnClickListener {
-            if(!HivemindBt.isBluetoothEnabled(this)){
+            if (!HivemindBt.isBluetoothEnabled(this)) {
                 HivemindBt.requestEnableBluetooth(this)
                 return@setOnClickListener
             }
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btn_client.setOnClickListener {
-            if(!HivemindBt.isBluetoothEnabled(this)){
+            if (!HivemindBt.isBluetoothEnabled(this)) {
                 HivemindBt.requestEnableBluetooth(this)
                 return@setOnClickListener
             }
@@ -57,30 +57,38 @@ class MainActivity : AppCompatActivity() {
 
             client?.let {
                 lol++
-                it.sendData("testClient".toByteArray(),"test")
+                it.sendData("testClient".toByteArray(), "test")
                 Toast.makeText(this, "lol: $lol", Toast.LENGTH_SHORT).show()
             }
         }
 
         btn_cached_data.setOnClickListener {
             val text = et_clientid.text
-            if(text != null) {
+            if (text != null) {
                 server?.let {
-                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())?: byteArrayOf()), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        String(it.getData("test", text.toString().toByte()) ?: byteArrayOf()),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 client?.let {
-                    Toast.makeText(this, String(it.getData("test", text.toString().toByte())?: byteArrayOf()), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        String(it.getData("test", text.toString().toByte()) ?: byteArrayOf()),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
 
-        sb_test.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        sb_test.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             var touching = false
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
-                if(touching) {
+                if (touching) {
                     server?.sendData(byteArrayOf(progress.toByte()), "seekbar")
                     client?.sendData(byteArrayOf(progress.toByte()), "seekbar")
                 }
@@ -110,7 +118,11 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDataChanged(data: ReceivedElement) {
             runOnUiThread {
-                Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}, with name: ${data.name}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    "New data: ${String(data.data)}, from ${data.from}, with name: ${data.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
                 lol = data.data[0]
             }
         }
@@ -145,10 +157,14 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDataChanged(data: ReceivedElement) {
             runOnUiThread {
-                if(data.dataId == 1.toByte()){
+                if (data.dataId == 1.toByte()) {
                     sb_test.progress = data.data[0].toInt()
                 } else {
-                    Toast.makeText(this@MainActivity, "New data: ${String(data.data)}, from ${data.from}, with name: ${data.name}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "New data: ${String(data.data)}, from ${data.from}, with name: ${data.name}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     lol = data.data[0]
                 }
             }

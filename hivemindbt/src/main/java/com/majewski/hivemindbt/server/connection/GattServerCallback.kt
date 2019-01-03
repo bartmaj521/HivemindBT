@@ -8,10 +8,12 @@ import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.ServerCallbacks
 import java.util.*
 
-internal class GattServerCallback(private val mConnectedDevices: ArrayList<BluetoothDevice>,
-                         private val mClientsAddresses: HashMap<String, Byte>,
-                         private val mServerData: SharedData,
-                         private val mServerCallbacks: ServerCallbacks?) : BluetoothGattServerCallback() {
+internal class GattServerCallback(
+    private val mConnectedDevices: ArrayList<BluetoothDevice>,
+    private val mClientsAddresses: HashMap<String, Byte>,
+    private val mServerData: SharedData,
+    private val mServerCallbacks: ServerCallbacks?
+) : BluetoothGattServerCallback() {
 
     private val maxNumberOfClients = 2
 
@@ -28,7 +30,7 @@ internal class GattServerCallback(private val mConnectedDevices: ArrayList<Bluet
             mConnectedDevices.remove(device)
             Log.d("HivemindServer", "Device disconnected")
             val id = mClientsAddresses[device.address]
-            id?.let{
+            id?.let {
                 mServerCallbacks?.onClientDisconnected(id)
             }
         }
@@ -42,7 +44,7 @@ internal class GattServerCallback(private val mConnectedDevices: ArrayList<Bluet
     ) {
         super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
 
-        if(characteristic?.uuid == Uuids.CHARACTERISTIC_CLIENT_ID) {
+        if (characteristic?.uuid == Uuids.CHARACTERISTIC_CLIENT_ID) {
             device?.let {
                 if (mClientsAddresses[device.address] == null) {
                     addNewClient(device)
@@ -76,8 +78,9 @@ internal class GattServerCallback(private val mConnectedDevices: ArrayList<Bluet
         gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
 
         characteristic?.let {
-            val clientId = characteristic.uuid.leastSignificantBits - Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits
-            if(clientId in 1..maxNumberOfClients) {
+            val clientId =
+                characteristic.uuid.leastSignificantBits - Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits
+            if (clientId in 1..maxNumberOfClients) {
                 Log.d("HivemindServer", "Received: ${value?.get(0)}")
 
                 val characteristicSendData = gattServer
@@ -87,14 +90,19 @@ internal class GattServerCallback(private val mConnectedDevices: ArrayList<Bluet
                 characteristicSendData?.value = value
                 Log.d("HivemindServer", "Characteristic value set.")
 
-                val devices = mConnectedDevices.filter{ mClientsAddresses.keys.contains(it.address) && it != device }
+                val devices = mConnectedDevices.filter { mClientsAddresses.keys.contains(it.address) && it != device }
 
-                for(device in devices) {
-                    gattServer?.notifyCharacteristicChanged(device,characteristicSendData, false)
+                for (device in devices) {
+                    gattServer?.notifyCharacteristicChanged(device, characteristicSendData, false)
                     Log.d("HivemindServer", "Notifying device ${device.name}")
                 }
-                value?.let{
-                    val recv = ReceivedElement(value[0], value[1],mServerData.getElementName(value[1]) ,value.copyOfRange(2, value.size))
+                value?.let {
+                    val recv = ReceivedElement(
+                        value[0],
+                        value[1],
+                        mServerData.getElementName(value[1]),
+                        value.copyOfRange(2, value.size)
+                    )
                     mServerData.setElementValueFromClient(recv.dataId, recv.from, recv.data)
                     mServerCallbacks?.onDataChanged(recv)
                 }
@@ -120,10 +128,11 @@ internal class GattServerCallback(private val mConnectedDevices: ArrayList<Bluet
     private fun addNewClient(device: BluetoothDevice) {
         nbOfClients++
         mClientsAddresses[device.address] = nbOfClients
-        val nbOfClientsCharacteristic = gattServer?.getService(Uuids.SERVICE_PRIMARY)?.getCharacteristic(Uuids.CHARACTERISTIC_NB_OF_CLIENTS)
+        val nbOfClientsCharacteristic =
+            gattServer?.getService(Uuids.SERVICE_PRIMARY)?.getCharacteristic(Uuids.CHARACTERISTIC_NB_OF_CLIENTS)
         nbOfClientsCharacteristic?.value = byteArrayOf(nbOfClients)
         Log.d("HivemindServer", "Number of connected devices: ${mConnectedDevices.size}")
-        for(d in mConnectedDevices) {
+        for (d in mConnectedDevices) {
             Log.d("HivemindServer", "Notifying device ${d.name}")
             gattServer?.notifyCharacteristicChanged(d, nbOfClientsCharacteristic, false)
         }

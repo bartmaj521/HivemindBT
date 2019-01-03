@@ -1,15 +1,20 @@
 package com.majewski.hivemindbt.client.connection
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothProfile
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
 import com.majewski.hivemindbt.client.ClientCallbacks
-import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.data.ReceivedElement
+import com.majewski.hivemindbt.data.SharedData
 import java.util.*
 
-internal class GattClientCallback(private val mClientData: SharedData,
-                         private val clientCallbacks: ClientCallbacks?): BluetoothGattCallback() {
+internal class GattClientCallback(
+    private val mClientData: SharedData,
+    private val clientCallbacks: ClientCallbacks?
+) : BluetoothGattCallback() {
 
     var mConnected = false
     var mInitialized = false
@@ -37,7 +42,7 @@ internal class GattClientCallback(private val mClientData: SharedData,
 
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
         super.onServicesDiscovered(gatt, status)
-        if(status != BluetoothGatt.GATT_SUCCESS) {
+        if (status != BluetoothGatt.GATT_SUCCESS) {
             return
         }
         mInitialized = true
@@ -59,7 +64,7 @@ internal class GattClientCallback(private val mClientData: SharedData,
     ) {
         super.onCharacteristicRead(gatt, characteristic, status)
 
-        if(characteristic.uuid == Uuids.CHARACTERISTIC_CLIENT_ID) {
+        if (characteristic.uuid == Uuids.CHARACTERISTIC_CLIENT_ID) {
             saveClientId(characteristic.value[0])
             setCharacteristicWriteType(gatt)
         }
@@ -67,20 +72,26 @@ internal class GattClientCallback(private val mClientData: SharedData,
 
     override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
         super.onCharacteristicChanged(gatt, characteristic)
-        when(characteristic?.uuid) {
+        when (characteristic?.uuid) {
             Uuids.CHARACTERISTIC_NB_OF_CLIENTS -> saveNbOfClients(characteristic.value[0])
             Uuids.CHARACTERISTIC_READ_DATA -> dataChanged(characteristic)
         }
     }
 
     private fun setCharacteristicWriteType(gatt: BluetoothGatt) {
-        val dataWriteCharacteristic = gatt.getService(Uuids.SERVICE_PRIMARY).getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + mClientData.clientId))
+        val dataWriteCharacteristic = gatt.getService(Uuids.SERVICE_PRIMARY)
+            .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + mClientData.clientId))
         dataWriteCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
     }
 
     private fun dataChanged(characteristic: BluetoothGattCharacteristic) {
         Log.d("HivemindClient", "Data received: ${characteristic.value[0]}")
-        val recv = ReceivedElement(characteristic.value[0], characteristic.value[1],mClientData.getElementName(characteristic.value[1]) ,characteristic.value.copyOfRange(2, characteristic.value.size))
+        val recv = ReceivedElement(
+            characteristic.value[0],
+            characteristic.value[1],
+            mClientData.getElementName(characteristic.value[1]),
+            characteristic.value.copyOfRange(2, characteristic.value.size)
+        )
         mClientData.setElementValueFromClient(recv.dataId, recv.from, recv.data)
         clientCallbacks?.onDataChanged(recv)
     }

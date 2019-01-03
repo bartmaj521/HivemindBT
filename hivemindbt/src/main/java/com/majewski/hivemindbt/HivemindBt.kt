@@ -16,7 +16,7 @@ object HivemindBt {
     }
 
     fun requestPermissions(activity: Activity): Boolean {
-        if (!hasLocationPermissions(activity)){
+        if (!hasLocationPermissions(activity)) {
             activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 2)
             return hasLocationPermissions(activity)
         }
@@ -24,7 +24,8 @@ object HivemindBt {
     }
 
     fun isBluetoothEnabled(activity: Activity): Boolean {
-        val bluetoothAdapter: BluetoothAdapter? = (activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
+        val bluetoothAdapter: BluetoothAdapter? =
+            (activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
         return !(bluetoothAdapter == null || !bluetoothAdapter.isEnabled)
     }
 

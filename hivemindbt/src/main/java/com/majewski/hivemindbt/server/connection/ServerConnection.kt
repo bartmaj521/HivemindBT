@@ -6,7 +6,6 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
-import android.content.Intent
 import android.os.ParcelUuid
 import android.util.Log
 import com.majewski.hivemindbt.Uuids
@@ -14,9 +13,11 @@ import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.ServerCallbacks
 import java.util.*
 
-internal class ServerConnection(private val mContext: Context,
-                       mServerData: SharedData,
-                       private val mServerCallbacks: ServerCallbacks?) {
+internal class ServerConnection(
+    private val mContext: Context,
+    mServerData: SharedData,
+    private val mServerCallbacks: ServerCallbacks?
+) {
 
     // Bluetooth variables
     private val mBluetoothManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -29,9 +30,10 @@ internal class ServerConnection(private val mContext: Context,
     private val mConnectedDevices = ArrayList<BluetoothDevice>()
     private val mClientsAddresses = HashMap<String, Byte>()
 
-    private val gattServerCallback = GattServerCallback(mConnectedDevices, mClientsAddresses, mServerData, mServerCallbacks)
+    private val gattServerCallback =
+        GattServerCallback(mConnectedDevices, mClientsAddresses, mServerData, mServerCallbacks)
 
-    private val mAdvertiseCallback = object: AdvertiseCallback() {
+    private val mAdvertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             super.onStartSuccess(settingsInEffect)
             Log.d("AdvertiseCallback", "Peripheral advertising started.")
@@ -66,10 +68,10 @@ internal class ServerConnection(private val mContext: Context,
         characteristic.value = byteArrayOf(0, elementId).plus(data)
         Log.d("HivemindServer", "Characteristic value set.")
 
-        val devices = mConnectedDevices.filter{ mClientsAddresses.keys.contains(it.address) }
+        val devices = mConnectedDevices.filter { mClientsAddresses.keys.contains(it.address) }
 
-        for(device in devices) {
-            mGattServer.notifyCharacteristicChanged(device,characteristic, false)
+        for (device in devices) {
+            mGattServer.notifyCharacteristicChanged(device, characteristic, false)
             Log.d("HivemindServer", "Notifying device ${device.name}")
         }
     }
@@ -99,7 +101,7 @@ internal class ServerConnection(private val mContext: Context,
         )
         service.addCharacteristic(dataReadCharacteristic)
 
-        for(i in 1..maxNbOfClients) {
+        for (i in 1..maxNbOfClients) {
             val dataWriteCharacteristic = BluetoothGattCharacteristic(
                 UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + i),
                 BluetoothGattCharacteristic.PROPERTY_WRITE,

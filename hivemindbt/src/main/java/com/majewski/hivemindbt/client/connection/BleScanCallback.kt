@@ -5,8 +5,10 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.util.Log
 
-class BleScanCallback(private val mScanResults: HashMap<String, BluetoothDevice>,
-                      private val onDeviceFound: (BluetoothDevice)->Unit): ScanCallback() {
+class BleScanCallback(
+    private val mScanResults: HashMap<String, BluetoothDevice>,
+    private val onDeviceFound: (BluetoothDevice) -> Unit
+) : ScanCallback() {
 
     override fun onScanResult(callbackType: Int, result: ScanResult?) {
         super.onScanResult(callbackType, result)

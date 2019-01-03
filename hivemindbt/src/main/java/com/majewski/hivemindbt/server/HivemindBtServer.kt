@@ -5,8 +5,10 @@ import com.majewski.hivemindbt.data.SharedData
 import com.majewski.hivemindbt.server.connection.ServerConnection
 
 
-class HivemindBtServer(mContext: Context,
-                       private val serverCallbacks: ServerCallbacks? = null) {
+class HivemindBtServer(
+    mContext: Context,
+    private val serverCallbacks: ServerCallbacks? = null
+) {
 
     private val mServerData = SharedData()
     private val mServerConnection = ServerConnection(mContext, mServerData, serverCallbacks)
