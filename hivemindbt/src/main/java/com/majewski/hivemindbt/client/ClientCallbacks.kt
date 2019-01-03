@@ -9,6 +9,8 @@ interface ClientCallbacks {
 
     fun onConnectedToServer(clientId: Byte)
 
+    fun onDisconnectedFromServer(device: BluetoothDevice)
+
     fun onNumberOfClientsChanged(newNumberOfClients: Byte)
 
     fun onDataChanged(data: ReceivedElement)

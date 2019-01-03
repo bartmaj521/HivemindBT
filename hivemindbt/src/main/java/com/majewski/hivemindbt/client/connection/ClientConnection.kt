@@ -66,6 +66,14 @@ internal class ClientConnection(private val mContext: Context,
         mGatt = device.connectGatt(mContext, false, gattClientCallback)
     }
 
+    fun disconnect() {
+        stopScan()
+        mGatt?.disconnect()
+        mGatt?.close()
+        gattClientCallback.mConnected = false
+        gattClientCallback.mInitialized = false
+    }
+
     fun sendData(data: ByteArray, elementId: Byte) {
         mGatt?.let {
             val characteristic = it

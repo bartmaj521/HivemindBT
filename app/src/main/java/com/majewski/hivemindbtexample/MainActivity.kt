@@ -135,6 +135,10 @@ class MainActivity : AppCompatActivity() {
             Log.d("lolol", "Connected to server")
         }
 
+        override fun onDisconnectedFromServer(device: BluetoothDevice) {
+            Log.d("lolol", "Disconnected from server")
+        }
+
         override fun onNumberOfClientsChanged(newNumberOfClients: Byte) {
             Log.d("lolol", "Nb of clients changed")
         }

@@ -11,8 +11,8 @@ import java.util.*
 internal class GattClientCallback(private val mClientData: SharedData,
                          private val clientCallbacks: ClientCallbacks?): BluetoothGattCallback() {
 
-    private var mConnected = false
-    private var mInitialized = false
+    var mConnected = false
+    var mInitialized = false
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
@@ -30,6 +30,7 @@ internal class GattClientCallback(private val mClientData: SharedData,
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d("HivemindClient", "Server offline")
                 disconnectGattServer(it)
+                clientCallbacks?.onDisconnectedFromServer(gatt?.device)
             }
         }
     }

@@ -22,6 +22,10 @@ class HivemindBtClient(context: Context, clientCallbacks: ClientCallbacks? = nul
         mClientConnection.connectDevice(device)
     }
 
+    fun disconnect() {
+        mClientConnection.disconnect()
+    }
+
     fun addData(name: String, id: Byte) {
         clientData.addElement(name, id)
     }
