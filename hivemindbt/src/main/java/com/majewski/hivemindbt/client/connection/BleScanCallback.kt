@@ -5,7 +5,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.util.Log
 
-class BleScanCallback(
+internal class BleScanCallback(
     private val mScanResults: HashMap<String, BluetoothDevice>,
     private val onDeviceFound: (BluetoothDevice) -> Unit
 ) : ScanCallback() {

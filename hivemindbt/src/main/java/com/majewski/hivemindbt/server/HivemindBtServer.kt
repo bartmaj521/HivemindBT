@@ -7,11 +7,15 @@ import com.majewski.hivemindbt.server.connection.ServerConnection
 
 class HivemindBtServer(
     mContext: Context,
-    private val serverCallbacks: ServerCallbacks? = null
+    maxNumberOfClients: Int,
+    serverCallbacks: ServerCallbacks? = null
 ) {
 
     private val mServerData = SharedData()
-    private val mServerConnection = ServerConnection(mContext, mServerData, serverCallbacks)
+    private val mServerConnection = ServerConnection(mContext, mServerData, maxNumberOfClients, serverCallbacks)
+
+    val nuberOfClients: Byte
+        get() = mServerData.nbOfClients
 
     fun startServer() {
         mServerConnection.startServer()

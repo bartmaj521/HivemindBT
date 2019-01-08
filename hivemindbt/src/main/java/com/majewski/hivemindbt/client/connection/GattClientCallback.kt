@@ -13,7 +13,7 @@ import java.util.*
 
 internal class GattClientCallback(
     private val mClientData: SharedData,
-    private val clientCallbacks: ClientCallbacks?
+    private val mClientCallbacks: ClientCallbacks?
 ) : BluetoothGattCallback() {
 
     var mConnected = false
@@ -35,7 +35,7 @@ internal class GattClientCallback(
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d("HivemindClient", "Server offline")
                 disconnectGattServer(it)
-                clientCallbacks?.onDisconnectedFromServer(gatt?.device)
+                mClientCallbacks?.onDisconnectedFromServer(gatt?.device)
             }
         }
     }
@@ -93,7 +93,7 @@ internal class GattClientCallback(
             characteristic.value.copyOfRange(2, characteristic.value.size)
         )
         mClientData.setElementValueFromClient(recv.dataId, recv.from, recv.data)
-        clientCallbacks?.onDataChanged(recv)
+        mClientCallbacks?.onDataChanged(recv)
     }
 
     private fun requestClientId(gatt: BluetoothGatt) {
@@ -106,14 +106,14 @@ internal class GattClientCallback(
 
     private fun saveClientId(id: Byte) {
         mClientData.clientId = id
-        clientCallbacks?.onConnectedToServer(id)
+        mClientCallbacks?.onConnectedToServer(id)
         Log.d("HivemindClient", "Connected, client id = $id")
     }
 
     private fun saveNbOfClients(nbOfClients: Byte) {
         mClientData.nbOfClients = nbOfClients
         Log.d("HivemindClient", "Number of clients changed = ${mClientData.nbOfClients}")
-        clientCallbacks?.onNumberOfClientsChanged(nbOfClients)
+        mClientCallbacks?.onNumberOfClientsChanged(nbOfClients)
     }
 
     private fun disconnectGattServer(gatt: BluetoothGatt) {

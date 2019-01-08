@@ -7,8 +7,14 @@ import com.majewski.hivemindbt.data.SharedData
 
 class HivemindBtClient(context: Context, clientCallbacks: ClientCallbacks? = null) {
 
-    private val clientData = SharedData()
-    private val mClientConnection = ClientConnection(context, clientData, clientCallbacks)
+    private val mClientData = SharedData()
+    private val mClientConnection = ClientConnection(context, mClientData, clientCallbacks)
+
+    val clientId: Byte
+    get() = mClientData.nbOfClients
+
+    val numberOfClients: Byte
+    get() = mClientData.nbOfClients
 
     fun startScan() {
         mClientConnection.startScan()
@@ -27,16 +33,16 @@ class HivemindBtClient(context: Context, clientCallbacks: ClientCallbacks? = nul
     }
 
     fun addData(name: String, id: Byte) {
-        clientData.addElement(name, id)
+        mClientData.addElement(name, id)
     }
 
     fun sendData(data: ByteArray, elementName: String) {
-        val elementId = clientData.getElementId(elementName) ?: throw NoSuchElementException()
-        clientData.setElementValue(elementId, data)
+        val elementId = mClientData.getElementId(elementName) ?: throw NoSuchElementException()
+        mClientData.setElementValue(elementId, data)
         mClientConnection.sendData(data, elementId)
     }
 
     fun getData(elementName: String, clientId: Byte): ByteArray? {
-        return clientData.getElementValue(elementName, clientId)
+        return mClientData.getElementValue(elementName, clientId)
     }
 }

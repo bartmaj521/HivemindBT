@@ -16,6 +16,7 @@ import java.util.*
 internal class ServerConnection(
     private val mContext: Context,
     mServerData: SharedData,
+    private val mMaxNumberOfClients: Int,
     private val mServerCallbacks: ServerCallbacks?
 ) {
 
@@ -25,13 +26,11 @@ internal class ServerConnection(
     private lateinit var mBluetoothAdvertiser: BluetoothLeAdvertiser
     private lateinit var mGattServer: BluetoothGattServer
 
-    private val maxNbOfClients = 2
-
     private val mConnectedDevices = ArrayList<BluetoothDevice>()
     private val mClientsAddresses = HashMap<String, Byte>()
 
     private val gattServerCallback =
-        GattServerCallback(mConnectedDevices, mClientsAddresses, mServerData, mServerCallbacks)
+        GattServerCallback(mConnectedDevices, mClientsAddresses, mServerData, mMaxNumberOfClients, mServerCallbacks)
 
     private val mAdvertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
@@ -101,7 +100,7 @@ internal class ServerConnection(
         )
         service.addCharacteristic(dataReadCharacteristic)
 
-        for (i in 1..maxNbOfClients) {
+        for (i in 1..mMaxNumberOfClients) {
             val dataWriteCharacteristic = BluetoothGattCharacteristic(
                 UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + i),
                 BluetoothGattCharacteristic.PROPERTY_WRITE,

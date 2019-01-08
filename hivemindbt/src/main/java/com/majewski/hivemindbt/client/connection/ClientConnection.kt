@@ -18,8 +18,8 @@ import kotlin.collections.HashMap
 
 internal class ClientConnection(
     private val mContext: Context,
-    private val clientData: SharedData,
-    private val clientCallbacks: ClientCallbacks?
+    private val mClientData: SharedData,
+    private val mClientCallbacks: ClientCallbacks?
 ) {
 
     // bluetooth variables
@@ -30,8 +30,8 @@ internal class ClientConnection(
     private var mGatt: BluetoothGatt? = null
 
     private val mScanResults = HashMap<String, BluetoothDevice>()
-    private val mScanCallback = BleScanCallback(mScanResults) { clientCallbacks?.onServerFound(it) }
-    private var gattClientCallback = GattClientCallback(clientData, clientCallbacks)
+    private val mScanCallback = BleScanCallback(mScanResults) { mClientCallbacks?.onServerFound(it) }
+    private var mGattClientCallback = GattClientCallback(mClientData, mClientCallbacks)
 
     private var mScanning = false
 
@@ -69,24 +69,24 @@ internal class ClientConnection(
     fun connectDevice(device: BluetoothDevice) {
         stopScan()
         Log.d("HivemindClient", "Connecting device")
-        mGatt = device.connectGatt(mContext, false, gattClientCallback)
+        mGatt = device.connectGatt(mContext, false, mGattClientCallback)
     }
 
     fun disconnect() {
         stopScan()
         mGatt?.disconnect()
         mGatt?.close()
-        gattClientCallback.mConnected = false
-        gattClientCallback.mInitialized = false
+        mGattClientCallback.mConnected = false
+        mGattClientCallback.mInitialized = false
     }
 
     fun sendData(data: ByteArray, elementId: Byte) {
         mGatt?.let {
             val characteristic = it
                 .getService(Uuids.SERVICE_PRIMARY)
-                .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + clientData.clientId))
+                .getCharacteristic(UUID(0L, Uuids.CHARACTERISTIC_READ_DATA.leastSignificantBits + mClientData.clientId))
 
-            characteristic.value = byteArrayOf(clientData.clientId, elementId).plus(data)
+            characteristic.value = byteArrayOf(mClientData.clientId, elementId).plus(data)
             it.writeCharacteristic(characteristic)
         }
     }

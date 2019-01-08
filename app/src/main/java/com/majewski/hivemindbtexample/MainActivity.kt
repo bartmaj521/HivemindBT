@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
                 HivemindBt.requestEnableBluetooth(this)
                 return@setOnClickListener
             }
-            server = HivemindBtServer(this, serverCallbacks)
+            server = HivemindBtServer(this, 2, serverCallbacks)
             server?.addData("test", 0)
             server?.addData("seekbar", 1)
             server?.startServer()
